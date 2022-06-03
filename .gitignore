@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+/x64/Debug
+/.vs/Traveling_Salesperson
+/Traveling_Salesperson/x64/Debug
