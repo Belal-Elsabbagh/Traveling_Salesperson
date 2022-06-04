@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #define nulledge -1
+#define MAX INT_MAX
 using namespace std;
 typedef vector<vector<int>> matrix;
 class TravelingSalesperson
@@ -21,10 +22,11 @@ private:
 	void print_current_solution_data(int newCost);
 	template<class T>
 	void printVector(vector<T> arr);
-	bool isVisited_OR_invalidValue(bool visited, int& weight) { return visited || weight == nulledge; }
+	bool isVisited(int node_index);
+	bool edgeExists(int start_node, int end_node);
 	void save_shortest_path_data(int newCost);
 
-	void calculate_shortest_path(int currPos = 0, int counter = 1, int cost = 0);
+	void calculate_shortest_path(int currPos = 0, int counter = 0, int cost = 0);
 };
 
 TravelingSalesperson::TravelingSalesperson(int size) : numOfNodes(size),
@@ -32,7 +34,7 @@ shortest_path(numOfNodes),
 current_path(numOfNodes),
 visited(numOfNodes, false),
 graph(numOfNodes, vector<int>(numOfNodes, nulledge)),
-ans(INT_MAX)
+ans(MAX)
 {}
 
 TravelingSalesperson::TravelingSalesperson(matrix g) : numOfNodes(g.size()),
@@ -40,23 +42,34 @@ shortest_path(numOfNodes),
 current_path(numOfNodes),
 visited(numOfNodes, false),
 graph(g),
-ans(INT_MAX)
+ans(MAX)
 {}
 
 void TravelingSalesperson::solve_tsp(int start_index)
 {
 	visited[start_index] = true;
 	calculate_shortest_path(start_index);
+	shortest_path.push_back(shortest_path[0]);
 }
 
 void TravelingSalesperson::print_solution(int start_index)
 {
-	cout << ans << "\nShortest path: "; printVector(shortest_path); cout << start_index + 1;
+	cout << "Cost of shortest path: " << ans << "\nShortest path: "; printVector(shortest_path);
 }
 
 inline void TravelingSalesperson::print_current_solution_data(int newCost)
 {
-	cout << "path: "; printVector(current_path); cout << current_path[0]; cout << "\tcost: " << newCost << "\n";
+	cout << "path: "; printVector(current_path); cout << "\tcost: " << newCost << "\n";
+}
+
+inline bool TravelingSalesperson::isVisited(int node_index) 
+{
+	return visited[node_index]; 
+}
+
+inline bool TravelingSalesperson::edgeExists(int start_node, int end_node) 
+{
+	return graph[start_node][end_node] != nulledge;
 }
 
 inline void TravelingSalesperson::save_shortest_path_data(int newCost)
@@ -67,24 +80,24 @@ inline void TravelingSalesperson::save_shortest_path_data(int newCost)
 	//cout << "Shortest path now is: "; printVector(shortest_path);  cout << "\tcost: " << ans << "\n";
 }
 
-inline void TravelingSalesperson::calculate_shortest_path(int currPos, int counter, int cost)
+inline void TravelingSalesperson::calculate_shortest_path(int current_node_index, int counter, int cost)
 {
+	if (cost > ans) return;
 	int newCost = 0;
-	current_path[counter - 1] = currPos + 1;
-	if (counter == numOfNodes && graph[currPos][0])
+	current_path[counter] = current_node_index + 1;
+	if (counter == numOfNodes - 1 && edgeExists(current_node_index,0))
 	{
-		newCost = cost + graph[currPos][0];
+		newCost = cost + graph[current_node_index][0];
 		if (newCost < ans) save_shortest_path_data(newCost);
-		//cout << "-------------------------------------------\n";
 		return;
 	}
+	current_path[counter] = current_node_index + 1;
 	for (int i = 0; i < numOfNodes; i++)
 	{
-		if (isVisited_OR_invalidValue(visited[i], graph[currPos][i])) continue;
+		if (isVisited(i) || !edgeExists(current_node_index, i)) continue;
 		
-		newCost = cost + graph[currPos][i];
+		newCost = cost + graph[current_node_index][i];
 		if (newCost > ans) continue;
-		
 		visited[i] = true;
 		calculate_shortest_path(i, counter + 1, newCost);
 		visited[i] = false;
@@ -94,8 +107,8 @@ inline void TravelingSalesperson::calculate_shortest_path(int currPos, int count
 template<class T>
 inline void TravelingSalesperson::printVector(vector<T> arr)
 {
-	for (T& i : arr)
+	for (size_t i = 0; i < arr.size(); i++)
 	{
-		cout << i << " ";
+		cout << arr[i] << " ";
 	}
 }
