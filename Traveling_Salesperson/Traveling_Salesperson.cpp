@@ -10,9 +10,9 @@ void RUN_TSP()
 		{ 20, 25, 30, 0 } 
 	};
 	TravelingSalesperson test1(graph1);
-	int start_index = 0;
-	test1.solve_tsp(start_index);
-	test1.print_solution(start_index);
+	int start_node = 1;
+	test1.solve_tsp(start_node);
+	test1.print_solution();
 	cout << "\n______________________________________________________________\n";
 	matrix graph2 =
 	{
@@ -22,9 +22,9 @@ void RUN_TSP()
 		{ 5, 4, 7, 0 }
 	};
 	TravelingSalesperson test2(graph2);
-	start_index = 0;
-	test2.solve_tsp(start_index);
-	test2.print_solution(start_index);
+	start_node = 1;
+	test2.solve_tsp(start_node);
+	test2.print_solution();
 	cout << "\n______________________________________________________________\n";
 }
 
