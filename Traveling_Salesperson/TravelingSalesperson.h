@@ -140,7 +140,7 @@ inline void TravelingSalesperson::save_shortest_path_data(int newCost)
 
 inline void TravelingSalesperson::calculate_shortest_path(int current_node_index, int counter, int cost)
 {
-	if (minimum_cost_exceeded(cost)) return;
+	if (cost > ans) return;
 	int newCost = 0;
 	current_path[counter] = current_node_index + 1;
 	if (counter == numOfNodes - 1 && edgeExists(current_node_index,0))
@@ -154,7 +154,7 @@ inline void TravelingSalesperson::calculate_shortest_path(int current_node_index
 		if (isVisited(i) || !edgeExists(current_node_index, i)) continue;
 		
 		newCost = cost + graph[current_node_index][i];
-		if (minimum_cost_exceeded(newCost)) continue;
+		if (newCost > ans) continue;
 		visited[i] = true;
 		calculate_shortest_path(i, counter + 1, newCost);
 		visited[i] = false;
