@@ -23,9 +23,9 @@ private:
 	template<class T>
 	void printVector(vector<T> arr);
 	bool isVisited(int node_index);
+	bool minimum_cost_exceeded(int cost) { return cost > ans; }
 	bool edgeExists(int start_node, int end_node);
 	void save_shortest_path_data(int newCost);
-
 	void calculate_shortest_path(int currPos = 0, int counter = 0, int cost = 0);
 };
 
@@ -112,8 +112,7 @@ inline bool TravelingSalesperson::edgeExists(int start_node_index, int end_node_
 inline void TravelingSalesperson::save_shortest_path_data(int newCost)
 {
 	ans = newCost;
-	for (size_t i = 0; i < numOfNodes; i++)
-		shortest_path[i] = current_path[i];
+	shortest_path = vector<int>(current_path);
 }
 
 /**
@@ -125,7 +124,7 @@ inline void TravelingSalesperson::save_shortest_path_data(int newCost)
  */
 inline void TravelingSalesperson::calculate_shortest_path(int current_node_index, int counter, int cost)
 {
-	if (cost > ans) return;
+	if (minimum_cost_exceeded(cost)) return;
 	int newCost = 0;
 	current_path[counter] = current_node_index + 1;
 	if (counter == numOfNodes - 1 && edgeExists(current_node_index,0))
@@ -134,13 +133,12 @@ inline void TravelingSalesperson::calculate_shortest_path(int current_node_index
 		if (newCost < ans) save_shortest_path_data(newCost);
 		return;
 	}
-	current_path[counter] = current_node_index + 1;
 	for (int i = 0; i < numOfNodes; i++)
 	{
 		if (isVisited(i) || !edgeExists(current_node_index, i)) continue;
 		
 		newCost = cost + graph[current_node_index][i];
-		if (newCost > ans) continue;
+		if (minimum_cost_exceeded(newCost)) continue;
 		visited[i] = true;
 		calculate_shortest_path(i, counter + 1, newCost);
 		visited[i] = false;
