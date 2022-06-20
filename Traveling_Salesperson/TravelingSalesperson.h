@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 #define nulledge -1
-#define MAX INT_MAX
+#define INF INT_MAX
 using namespace std;
 typedef vector<vector<int>> matrix;
 class TravelingSalesperson
@@ -94,7 +94,7 @@ shortest_path(nNodes),
 current_path(nNodes),
 visited(nNodes, false),
 graph(nNodes, vector<int>(nNodes, nulledge)),
-ans(MAX)
+ans(INF)
 {}
 
 TravelingSalesperson::TravelingSalesperson(matrix g) : numOfNodes(g.size()),
@@ -102,7 +102,7 @@ shortest_path(numOfNodes),
 current_path(numOfNodes),
 visited(numOfNodes, false),
 graph(g),
-ans(MAX)
+ans(INF)
 {}
 
 void TravelingSalesperson::solve_tsp(int start_node)
@@ -140,7 +140,6 @@ inline void TravelingSalesperson::save_shortest_path_data(int newCost)
 
 inline void TravelingSalesperson::calculate_shortest_path(int current_node_index, int counter, int cost)
 {
-	if (cost > ans) return;
 	int newCost = 0;
 	current_path[counter] = current_node_index + 1;
 	if (counter == numOfNodes - 1 && edgeExists(current_node_index,0))
@@ -149,15 +148,16 @@ inline void TravelingSalesperson::calculate_shortest_path(int current_node_index
 		if (newCost < ans) save_shortest_path_data(newCost);
 		return;
 	}
-	for (int i = 0; i < numOfNodes; i++)
+	for (int next_node = 0; next_node < numOfNodes; next_node++)
 	{
-		if (isVisited(i) || !edgeExists(current_node_index, i)) continue;
+		if (isVisited(next_node) || !edgeExists(current_node_index, next_node)) continue;
 		
-		newCost = cost + graph[current_node_index][i];
+		newCost = cost + graph[current_node_index][next_node];
 		if (newCost > ans) continue;
-		visited[i] = true;
-		calculate_shortest_path(i, counter + 1, newCost);
-		visited[i] = false;
+		
+		visited[next_node] = true;
+		calculate_shortest_path(next_node, counter + 1, newCost);
+		visited[next_node] = false;
 	}
 }
 
