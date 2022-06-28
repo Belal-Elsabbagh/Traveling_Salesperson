@@ -37,7 +37,7 @@ public:
 	void print_solution();
 private:
 	size_t numOfNodes;
-	int ans;
+	int minimum_weight;
 	matrix graph;
 	vector<int> shortest_path, current_path;
 	vector<bool> visited;
@@ -79,6 +79,8 @@ private:
 	
 	void save_shortest_path_data(int newCost);
 
+	bool isPromising(int current_node_index, int next_node_index, int cost);
+
 	/**
 	 * \brief calculates the shortest path data and updates it in the shortest path data member of the class..
 	 * 
@@ -94,7 +96,7 @@ shortest_path(nNodes),
 current_path(nNodes),
 visited(nNodes, false),
 graph(nNodes, vector<int>(nNodes, nulledge)),
-ans(INF)
+minimum_weight(INF)
 {}
 
 TravelingSalesperson::TravelingSalesperson(matrix g) : numOfNodes(g.size()),
@@ -102,7 +104,7 @@ shortest_path(numOfNodes),
 current_path(numOfNodes),
 visited(numOfNodes, false),
 graph(g),
-ans(INF)
+minimum_weight(INF)
 {}
 
 void TravelingSalesperson::solve_tsp(int start_node)
@@ -114,7 +116,7 @@ void TravelingSalesperson::solve_tsp(int start_node)
 
 void TravelingSalesperson::print_solution()
 {
-	cout << "Cost of shortest path: " << ans << "\nShortest path: "; printVector(shortest_path);
+	cout << "Cost of shortest path: " << minimum_weight << "\nShortest path: "; printVector(shortest_path);
 }
 
 inline void TravelingSalesperson::print_current_solution_data(int newCost)
@@ -134,8 +136,14 @@ inline bool TravelingSalesperson::edgeExists(int start_node_index, int end_node_
 
 inline void TravelingSalesperson::save_shortest_path_data(int newCost)
 {
-	ans = newCost;
+	minimum_weight = newCost;
 	shortest_path = vector<int>(current_path);
+}
+
+inline bool TravelingSalesperson::isPromising(int current_node_index, int next_node_index, int cost)
+{
+	if (!edgeExists(current_node_index, next_node_index)) return false;
+	return cost < minimum_weight && !isVisited(next_node_index);
 }
 
 inline void TravelingSalesperson::calculate_shortest_path(int current_node_index, int counter, int cost)
@@ -145,15 +153,14 @@ inline void TravelingSalesperson::calculate_shortest_path(int current_node_index
 	if (counter == numOfNodes - 1 && edgeExists(current_node_index,0))
 	{
 		newCost = cost + graph[current_node_index][0];
-		if (newCost < ans) save_shortest_path_data(newCost);
+		print_current_solution_data(newCost);
+		save_shortest_path_data(newCost);
 		return;
 	}
 	for (int next_node = 0; next_node < numOfNodes; next_node++)
 	{
-		if (isVisited(next_node) || !edgeExists(current_node_index, next_node)) continue;
-		
 		newCost = cost + graph[current_node_index][next_node];
-		if (newCost > ans) continue;
+		if (!isPromising(current_node_index, next_node, newCost)) continue;
 		
 		visited[next_node] = true;
 		calculate_shortest_path(next_node, counter + 1, newCost);
